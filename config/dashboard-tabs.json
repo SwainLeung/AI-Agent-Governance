@@ -1,0 +1,36 @@
+{
+  "schema_version": "governance-dashboard-tabs@1.0.0",
+  "source_of_truth": "machine-readable governance state and evidence records",
+  "read_only": true,
+  "tabs": [
+    {"id": "overview", "order": 1, "label": "Overview", "label_zh": "总览", "purpose": "portfolio health, current decision, freshness, and checklist progress"},
+    {"id": "projects", "order": 2, "label": "Projects", "label_zh": "项目", "purpose": "bounded registry, risk tier, state ledger, and first blind spot"},
+    {"id": "governance-audit", "order": 3, "label": "Governance Audit", "label_zh": "治理审计", "purpose": "system-theory blind spots and execution-chain control coverage"},
+    {"id": "features", "order": 4, "label": "Features", "label_zh": "能力", "purpose": "governance capabilities and adoption state"},
+    {"id": "functions", "order": 5, "label": "Functions", "label_zh": "函数", "purpose": "executable entrypoints, output, trigger, and approval boundary"},
+    {"id": "architecture", "order": 6, "label": "Architecture", "label_zh": "架构", "purpose": "policy, control, project, and external planes plus execution stages"},
+    {"id": "control-plane", "order": 7, "label": "Control Plane", "label_zh": "控制平面", "purpose": "routing, checkpoints, traces, retry, recovery, and adapter boundaries"},
+    {"id": "external-plane", "order": 8, "label": "External Plane", "label_zh": "外部平面", "purpose": "external-write policy, human approval, live verification, and rollback"},
+    {"id": "actions", "order": 9, "label": "Actions", "label_zh": "行动", "purpose": "checklist-driven TODO queue with owner, dependency, and next action"},
+    {"id": "sections", "order": 10, "label": "Sections", "label_zh": "阶段", "purpose": "execution stages, entry conditions, exit evidence, and failure actions"},
+    {"id": "sources", "order": 11, "label": "Sources", "label_zh": "来源", "purpose": "source paths, generated state, freshness, and evidence links"},
+    {"id": "records", "order": 12, "label": "Records", "label_zh": "记录", "purpose": "status, evidence, decisions, rollback, and reconciliation records"},
+    {"id": "metrics", "order": 13, "label": "Metrics", "label_zh": "指标", "purpose": "coverage, stale state, adoption, checklist, and blind-spot metrics"},
+    {"id": "lineage", "order": 14, "label": "Lineage", "label_zh": "谱系", "purpose": "intent to checklist item to evidence to decision to rollback"}
+  ],
+  "features": [
+    {"id": "state-ledger", "name": "Canonical state ledger", "status": "active", "category": "state", "source": "config/project-governance.schema.json"},
+    {"id": "execution-contract", "name": "Execution-chain contract", "status": "active", "category": "execution", "source": "config/execution-contract.json"},
+    {"id": "evidence-approval", "name": "Evidence and approval binding", "status": "active", "category": "review", "source": "docs/HUMAN-IN-THE-LOOP.md"},
+    {"id": "inventory-reconciliation", "name": "Inventory and reconciliation", "status": "active", "category": "observation", "source": "scripts/build_governance_inventory.py"},
+    {"id": "dashboard-projection", "name": "Read-only Dashboard projection", "status": "active", "category": "projection", "source": "config/dashboard-tabs.json"},
+    {"id": "project-adoption", "name": "L2/L3 project adoption", "status": "in_progress", "category": "migration", "source": "reports/governance-adoption-queue.json"}
+  ],
+  "functions": [
+    {"id": "build-inventory", "name": "Build bounded governance inventory", "status": "active", "trigger": "refresh", "entrypoint": "scripts/build_governance_inventory.py", "output": "reports/project-governance-inventory.json", "approval": "read-only"},
+    {"id": "validate-governance", "name": "Validate governance contract", "status": "active", "trigger": "pre-handoff", "entrypoint": "scripts/validate_governance.py", "output": "validation result and evidence report", "approval": "read-only"},
+    {"id": "create-rollback", "name": "Create restore point", "status": "active", "trigger": "before governance change", "entrypoint": "scripts/create_rollback_manifest.py", "output": "reports/rollback/governance-restore-point.json + archive", "approval": "human review before restore"},
+    {"id": "adapter-route", "name": "Prepare control-plane route", "status": "active", "trigger": "non-trivial task", "entrypoint": "control-plane adapter prepare", "output": "route decision and run context", "approval": "none for preparation"},
+    {"id": "adoption-queue", "name": "Generate L2/L3 adoption queue", "status": "active", "trigger": "inventory refresh", "entrypoint": "scripts/build_governance_dashboard.py", "output": "reports/governance-adoption-queue.json", "approval": "project-owner review before mutation"}
+  ]
+}

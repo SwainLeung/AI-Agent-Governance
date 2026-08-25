@@ -1,0 +1,117 @@
+{
+  "schema_version": "governance-execution-contract@1.1.0",
+  "default_freshness_ttl_hours": 24,
+  "external_write_policy": {
+    "requires_human_review_stage": "human_review",
+    "requires_deploy_stage": "deploy",
+    "requires_live_verification_stage": "verify",
+    "fail_closed_when": [
+      "missing_evidence",
+      "stale_evidence",
+      "unknown_state",
+      "scope_changed",
+      "artifact_hash_changed",
+      "rollback_not_ready"
+    ]
+  },
+  "stages": [
+    {
+      "id": "intent",
+      "entry_conditions": ["user_objective_received"],
+      "exit_evidence": ["scoped_task_record"],
+      "failure_action": "request_clarification",
+      "retry_policy": {"max_attempts": 1, "backoff_seconds": 0},
+      "reentry_policy": "replace_only_after_scope_change"
+    },
+    {
+      "id": "scoped",
+      "entry_conditions": ["intent_record_exists"],
+      "exit_evidence": ["scope_manifest", "dependency_refs", "risk_tier"],
+      "failure_action": "block_scope_expansion",
+      "retry_policy": {"max_attempts": 2, "backoff_seconds": 5},
+      "reentry_policy": "replan_when_scope_changes"
+    },
+    {
+      "id": "planned",
+      "entry_conditions": ["scope_manifest_exists"],
+      "exit_evidence": ["run_id", "plan_id", "route_prepared", "rollback_plan"],
+      "failure_action": "revise_plan",
+      "retry_policy": {"max_attempts": 2, "backoff_seconds": 5},
+      "reentry_policy": "replan_when_dependency_or_risk_changes"
+    },
+    {
+      "id": "executing",
+      "entry_conditions": ["plan_id_exists", "approved_tools_available"],
+      "exit_evidence": ["trace_ref", "checkpoint_ref", "changed_files_or_noop"],
+      "failure_action": "retry_or_fallback",
+      "retry_policy": {"max_attempts": 3, "backoff_seconds": 10},
+      "reentry_policy": "resume_from_last_checkpoint_when_idempotent"
+    },
+    {
+      "id": "evidence_ready",
+      "entry_conditions": ["execution_completed"],
+      "exit_evidence": ["test_report", "artifact_manifest", "source_hash", "risk_review"],
+      "failure_action": "block",
+      "retry_policy": {"max_attempts": 2, "backoff_seconds": 5},
+      "reentry_policy": "rebuild_artifact_when_hash_or_scope_changes"
+    },
+    {
+      "id": "human_review",
+      "entry_conditions": ["evidence_ready", "risk_tier_at_least_L2"],
+      "exit_evidence": ["decision_record", "reviewer", "approved_scope", "artifact_hash", "expires_at", "rollback_ref"],
+      "failure_action": "request_changes_or_reject",
+      "retry_policy": {"max_attempts": 1, "backoff_seconds": 0},
+      "reentry_policy": "new_decision_required_when_approval_binding_changes"
+    },
+    {
+      "id": "deploy",
+      "entry_conditions": ["human_review_approved", "rollback_ready", "adapter_available"],
+      "exit_evidence": ["adapter_response", "before_hash", "after_hash", "deployment_ref"],
+      "failure_action": "fail_closed_and_recover",
+      "retry_policy": {"max_attempts": 2, "backoff_seconds": 15},
+      "reentry_policy": "resume_only_when_adapter_reports_idempotent"
+    },
+    {
+      "id": "verify",
+      "entry_conditions": ["deployment_ref_exists"],
+      "exit_evidence": ["live_verification_report", "observed_artifact_hash", "verification_window"],
+      "failure_action": "hold_or_rollback",
+      "retry_policy": {"max_attempts": 2, "backoff_seconds": 30},
+      "reentry_policy": "repeat_observation_without_redeploy"
+    },
+    {
+      "id": "observe",
+      "entry_conditions": ["verify_passed_or_known_partial"],
+      "exit_evidence": ["observation_report", "feedback_ref", "defect_or_drift_result"],
+      "failure_action": "adjust_or_rollback",
+      "retry_policy": {"max_attempts": 1, "backoff_seconds": 0},
+      "reentry_policy": "open_new_cycle_for_adjustment"
+    },
+    {
+      "id": "blocked",
+      "entry_conditions": ["required_evidence_missing_or_failure_unresolved"],
+      "exit_evidence": ["block_reason", "owner", "unblock_action", "next_review_at"],
+      "failure_action": "hold_changes",
+      "retry_policy": {"max_attempts": 1, "backoff_seconds": 0},
+      "reentry_policy": "resume_after_unblock_evidence"
+    },
+    {
+      "id": "recovery",
+      "entry_conditions": ["partial_write_or_unknown_external_state"],
+      "exit_evidence": ["reconciliation_report", "recovery_decision", "rollback_or_confirmed_state"],
+      "failure_action": "stop_external_writes",
+      "retry_policy": {"max_attempts": 1, "backoff_seconds": 0},
+      "reentry_policy": "resume_after_state_reconciliation"
+    }
+  ],
+  "failure_taxonomy": [
+    {"code": "AUTH", "meaning": "credential or permission failure", "default_action": "fail_closed"},
+    {"code": "NETWORK", "meaning": "timeout or transport failure", "default_action": "retry_then_hold"},
+    {"code": "QUALITY", "meaning": "test, policy, or content quality failure", "default_action": "block"},
+    {"code": "SCOPE", "meaning": "target or dependency scope changed", "default_action": "replan"},
+    {"code": "EVIDENCE", "meaning": "required evidence missing or stale", "default_action": "block"},
+    {"code": "ADAPTER", "meaning": "adapter contract or idempotency failure", "default_action": "recovery"},
+    {"code": "DRIFT", "meaning": "local, recorded, or external state disagrees", "default_action": "reconcile"},
+    {"code": "APPROVAL", "meaning": "decision missing, expired, or out of scope", "default_action": "human_review"}
+  ]
+}

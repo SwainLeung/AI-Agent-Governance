@@ -1,0 +1,24 @@
+{
+  "schema_version": "governed-project-registry-template@1.0.0",
+  "registry_mode": "private-local",
+  "local_registry_file": "config/project-roots.local.json",
+  "projects": [],
+  "project_template": {
+    "id": "project-id",
+    "path": "private-local-path",
+    "role": "application",
+    "risk_tier": "L1"
+  },
+  "allowed_roles": [
+    "policy_plane",
+    "control_plane",
+    "portfolio",
+    "application",
+    "research_project",
+    "knowledge_source",
+    "deployment_project",
+    "control_or_rules"
+  ],
+  "allowed_risk_tiers": ["L0", "L1", "L2", "L3"],
+  "privacy_note": "Populate project-roots.local.json in a private workspace. Do not commit local project names or paths."
+}

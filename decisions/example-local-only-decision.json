@@ -1,0 +1,14 @@
+{
+  "decision": "approve_local_only_change",
+  "reviewer": "governance-maintainer",
+  "scope": "local governance artifacts only",
+  "artifact_hash": "sha256:replace-with-local-artifact-hash",
+  "source_hash": "sha256:replace-with-local-source-hash",
+  "evidence_ids": ["reports/local/evidence/example.json"],
+  "risk_tier": "L1-local-only",
+  "approved_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "expires_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "rollback_ref": "reports/local/rollback/example.json",
+  "external_mutation": false,
+  "notes": "Public example only. Replace values in a private runtime record; do not commit personal project identifiers or paths."
+}

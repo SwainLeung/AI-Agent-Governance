@@ -1,0 +1,116 @@
+{
+  "schema_version": "governance-hardening-checklist@1.0.0",
+  "owner": "governance-maintainers",
+  "items": [
+    {
+      "id": "GOV-P0-001",
+      "priority": "P0",
+      "domain": "state",
+      "title": "Make the current-state ledger canonical and freshness-aware",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": [],
+      "exit_evidence": ["config/project-governance.schema.json", "STATUS.json", "docs/SYSTEM-MODEL.md"],
+      "next_action": "Apply the ledger contract to private registered projects, starting with L2/L3.",
+      "blind_spots": ["state_drift", "queue_illusion"]
+    },
+    {
+      "id": "GOV-P0-002",
+      "priority": "P0",
+      "domain": "execution_chain",
+      "title": "Encode stage gates, failure actions, retry, and re-entry rules",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-001"],
+      "exit_evidence": ["config/execution-contract.json", "docs/EXECUTION-CHAIN.md"],
+      "next_action": "Require adapters to report idempotency and checkpoint references.",
+      "blind_spots": ["observability_gap", "failure_collapse"]
+    },
+    {
+      "id": "GOV-P0-003",
+      "priority": "P0",
+      "domain": "evidence_and_approval",
+      "title": "Bind evidence, decision, artifact hash, scope, expiry, and rollback",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-001", "GOV-P0-002"],
+      "exit_evidence": ["config/execution-contract.json", "docs/HUMAN-IN-THE-LOOP.md", "docs/DOCUMENTATION-CONTRACT.md"],
+      "next_action": "Reject any L2/L3 approval that is not artifact- and scope-bound.",
+      "blind_spots": ["approval_ambiguity", "rollback_blindness", "false_convergence"]
+    },
+    {
+      "id": "GOV-P0-004",
+      "priority": "P0",
+      "domain": "verification",
+      "title": "Add an executable governance validator before handoff",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-001", "GOV-P0-002", "GOV-P0-003"],
+      "exit_evidence": ["scripts/validate_governance.py", "reports/README.md"],
+      "next_action": "Run the validator in each project adoption workflow.",
+      "blind_spots": ["observability_gap", "state_drift"]
+    },
+    {
+      "id": "GOV-P1-001",
+      "priority": "P1",
+      "domain": "reconciliation",
+      "title": "Make drift, stale state, hidden coupling, and external reconciliation explicit",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-004"],
+      "exit_evidence": ["scripts/build_governance_inventory.py", "reports/README.md", "docs/SYSTEM-MODEL.md"],
+      "next_action": "Schedule a quarterly drift review and pre-write reconciliation.",
+      "blind_spots": ["state_drift", "hidden_coupling", "queue_illusion"]
+    },
+    {
+      "id": "GOV-P1-002",
+      "priority": "P1",
+      "domain": "dashboard",
+      "title": "Project first missing evidence, freshness, blockers, and lineage",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-004", "GOV-P1-001"],
+      "exit_evidence": ["config/dashboard-tabs.json", "docs/DASHBOARD-STANDARD.md"],
+      "next_action": "Keep the dashboard generated from machine-readable inventory only.",
+      "blind_spots": ["false_convergence", "observability_gap", "feedback_delay"]
+    },
+    {
+      "id": "GOV-P1-003",
+      "priority": "P1",
+      "domain": "feedback",
+      "title": "Close the loop with observation windows and post-release feedback",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-002", "GOV-P0-003"],
+      "exit_evidence": ["config/execution-contract.json", "docs/EXECUTION-CHAIN.md", "docs/SYSTEM-MODEL.md"],
+      "next_action": "Require observation reports for every external write.",
+      "blind_spots": ["feedback_delay", "false_convergence"]
+    },
+    {
+      "id": "GOV-P2-001",
+      "priority": "P2",
+      "domain": "adoption",
+      "title": "Adopt the minimum state/evidence/decision/rollback contract in L2/L3 projects",
+      "status": "in_progress",
+      "owner": "Project owners",
+      "depends_on": ["GOV-P0-001", "GOV-P0-003", "GOV-P0-004"],
+      "exit_evidence": ["config/project-roots.local.json", "private project status ledgers", "private project evidence bundles"],
+      "started_at": "2026-08-25T14:00:00+08:00",
+      "progress": "Generated a bounded L2/L3 adoption queue; project-owner execution remains required.",
+      "next_action": "Start with the highest-risk private registered project, then continue by risk tier.",
+      "blind_spots": ["adoption_gap", "hidden_coupling"]
+    },
+    {
+      "id": "GOV-P2-002",
+      "priority": "P2",
+      "domain": "review",
+      "title": "Run quarterly governance drift and stale-state review",
+      "status": "pending",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P1-001", "GOV-P1-002", "GOV-P1-003"],
+      "exit_evidence": ["quarterly review report", "reconciliation evidence", "updated checklist"],
+      "next_action": "Schedule the first review after private L2/L3 adoption starts.",
+      "blind_spots": ["state_drift", "feedback_delay", "queue_illusion"]
+    }
+  ]
+}

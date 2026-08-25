@@ -1,0 +1,33 @@
+# Governance runtime and secret safety
+.agent-manager/
+*.log
+.env
+.env.*
+credentials/
+credential vault/
+**/credentials/
+**/credential vault/
+**/*credential*.json
+**/*client_secret*.json
+**/*token*.json
+**/*.key
+**/*.dpapi
+
+# Build/runtime caches
+__pycache__/
+*.py[cod]
+
+# Private generated projection: keep the local Dashboard, never commit the HTML.
+/dashboard.html
+
+# Private local registry and generated runtime reports.
+/config/project-roots.local.json
+/STATUS.local.json
+/reports/local/
+/reports/local-*/
+/reports/rollback/
+/reports/evidence/
+/reports/project-governance-inventory.json
+/reports/project-governance-inventory.md
+/reports/governance-dashboard-state.json
+/reports/governance-adoption-queue.json

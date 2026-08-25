@@ -1,0 +1,26 @@
+{
+  "schema_version": "governed-project-state@1.1.0",
+  "project_id": "governance-public-template",
+  "stage": "planned",
+  "status": "not_applicable",
+  "owner": "governance-maintainers",
+  "generated_at": "2026-08-25T00:00:00Z",
+  "last_verified_at": null,
+  "freshness_ttl_hours": 24,
+  "run_id": null,
+  "source_refs": [
+    "config/project-roots.json",
+    "config/project-governance.schema.json",
+    "config/execution-contract.json",
+    "config/governance-checklist.json",
+    "config/dashboard-tabs.json",
+    "docs/GOVERNANCE-DASHBOARD-DESIGN.md"
+  ],
+  "evidence": [],
+  "dependencies": ["private local registry is optional for public template use"],
+  "next_action": "Copy the public registry template to config/project-roots.local.json in a private workspace before local inventory refresh.",
+  "decision": null,
+  "rollback_ref": null,
+  "reconciliation": {"status": "not_run", "checked_at": "2026-08-25T00:00:00Z", "evidence_ref": "reports/README.md"},
+  "metrics": {"public_registry_entries": 0, "private_runtime_loaded": false}
+}
