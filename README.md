@@ -1,17 +1,41 @@
 # AI Agent Governance
 
-This repository is the public policy plane for governing AI Agent projects. It contains reusable contracts, schemas, execution controls, Dashboard design, generators, and sanitized examples.
+Public policy plane for governing AI Agent projects.
 
-## Public/private separation
+Status: public template + private-local runtime separation established. Last documented verification: 2026-08-25.
 
-The repository is intentionally usable without a project inventory:
+## What this project provides
 
-- Public: policy documents, schemas, execution contract, Dashboard tab configuration, generators, and anonymized templates.
-- Private local: actual project registry, local paths, generated inventories, evidence, rollback archives, adoption queues, and rendered `dashboard.html`.
+- lifecycle and execution-chain contracts;
+- state, evidence, decision, rollback, and reconciliation schemas;
+- human-review and fail-closed external-write rules;
+- a detailed read-only Dashboard information architecture;
+- local inventory, Dashboard, validation, and rollback generators;
+- sanitized examples that are safe to publish.
 
-Populate the ignored `config/project-roots.local.json` locally to generate a private Dashboard. The public `config/project-roots.json` contains only registration fields, allowed roles, and risk-tier options.
+This repository defines governance. It does not own project business code, credentials, production logs, external deployment, or publication decisions.
 
-## Operating model
+## Public/private boundary
+
+The repository is intentionally usable without a private project inventory.
+
+Public Git contains:
+
+- policy documents and standards;
+- machine-readable schemas and execution contracts;
+- Dashboard tab definitions and generation code;
+- public checklists and anonymized examples.
+
+Private local runtime contains:
+
+- the actual project registry;
+- local paths and project identifiers;
+- generated inventory, Dashboard state, adoption queue, evidence, and rollback archives;
+- rendered `dashboard.html`.
+
+The local registry belongs in ignored `config/project-roots.local.json`. The public `config/project-roots.json` contains only registration fields, allowed roles, risk tiers, and privacy instructions.
+
+## Operating flow
 
 ```text
 Public policy and schemas
@@ -20,33 +44,24 @@ Public policy and schemas
   -> private evidence and Dashboard state
   -> human decision
   -> approved project operation
-  -> verification and feedback
+  -> live verification and observation
+  -> feedback and next cycle
 ```
 
 The Dashboard is a read-only projection. It cannot approve, publish, deploy, or mutate a project.
 
-## Main documents
+## Repository map
 
-- `docs/SYSTEM-MODEL.md` - boundaries, feedback loops, invariants, and blind spots.
-- `docs/EXECUTION-CHAIN.md` - operation stages, evidence gates, retry, recovery, and rollback.
-- `docs/HUMAN-IN-THE-LOOP.md` - risk tiers and exact-scope approval fields.
-- `docs/DASHBOARD-STANDARD.md` - projection, freshness, uncertainty, and privacy requirements.
-- `docs/GOVERNANCE-DASHBOARD-DESIGN.md` - detailed tabs, statistics, and lineage.
-- `docs/MIGRATION-CHECKLIST.md` - project adoption contract.
+- `config/` - public contracts, templates, and Dashboard information architecture.
+- `docs/` - system model, execution chain, human review, security, migration, and Dashboard design.
+- `scripts/` - local inventory, Dashboard, validation, and rollback tooling.
+- `decisions/` - sanitized public examples only; real decisions belong to ignored local runtime records.
+- `reports/` - public report policy and sanitized assessments; generated runtime reports are ignored.
+- `STATUS.json` - public template state; local runtime may use ignored `STATUS.local.json`.
 
-## Machine-readable public assets
+## Local workflow
 
-- `config/project-roots.json` - public registry template and allowed options.
-- `config/project-governance.schema.json` - current-state ledger schema.
-- `config/execution-contract.json` - stage gates, failure taxonomy, retry, and recovery rules.
-- `config/governance-checklist.json` - public hardening checklist without personal project identifiers.
-- `config/dashboard-tabs.json` - Dashboard information architecture and public capability definitions.
-- `scripts/build_governance_inventory.py` - private/local bounded inventory builder.
-- `scripts/build_governance_dashboard.py` - private/local Dashboard state and HTML generator.
-- `scripts/validate_governance.py` - contract and evidence validator.
-- `scripts/create_rollback_manifest.py` - local restore-point generator.
-
-## Local refresh
+In a private workspace, populate `config/project-roots.local.json`, then run:
 
 ```powershell
 python scripts/build_governance_inventory.py
@@ -54,4 +69,24 @@ python scripts/validate_governance.py
 python scripts/create_rollback_manifest.py
 ```
 
-With `config/project-roots.local.json` present, generated outputs go to ignored `reports/local/` and `dashboard.html` stays local. Without it, the public template produces an empty, non-personal inventory.
+With the local registry present, outputs are written under ignored `reports/local/` and the rendered Dashboard remains local. Without it, the public template produces an empty, non-personal inventory.
+
+## Development stages
+
+1. Policy: define boundaries, invariants, risk tiers, and stage gates.
+2. Runtime separation: keep registries, paths, reports, traces, and rendered HTML private.
+3. Verification: validate schemas, freshness, evidence references, and rollback readiness.
+4. Adoption: apply the minimum contract to private registered projects by risk tier.
+5. Operations: add reconciliation, live verification, observation windows, and feedback metrics.
+
+## Change gates
+
+Before merging a public change:
+
+- run the public-template validator;
+- run the local validator when a private registry is available;
+- scan the staged public tree for local paths, project identifiers, credentials, and generated runtime files;
+- keep rendered HTML and runtime reports ignored;
+- update README, CHANGELOG, and CHECKLIST when behavior or boundaries change.
+
+See [CHECKLIST.md](CHECKLIST.md) for the current work queue.

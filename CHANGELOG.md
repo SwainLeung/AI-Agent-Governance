@@ -2,20 +2,26 @@
 
 ## [Unreleased]
 
+### 2026-08-25 Documentation and public-release update
+
+- Synchronized README, CHECKLIST, and CHANGELOG with the public-policy/private-runtime architecture.
+- Documented the repository status, development stages, release gates, and local refresh workflow.
+- Confirmed that public validation works without a project registry and that private local runtime data remains ignored.
+- Retained Dashboard configuration, schemas, generators, and sanitized examples as public development assets.
+
 ### 2026-08-25 Public repository sanitization
 
-- Separated public policy assets from private local registry and runtime outputs.
-- Replaced the public registry with a template containing only registration fields, role options, and risk-tier options.
-- Moved local registry, generated inventory, Dashboard state, evidence, adoption queue, and rollback archives to ignored runtime locations.
-- Classified rendered `dashboard.html` as local-only.
-- Replaced concrete runtime decisions and project reports with sanitized public examples.
-- Prepared the public `main` history for rewrite so previously committed local identifiers are not retained in visible history.
+- Replaced the public project registry with a template containing only registration fields, role options, and risk-tier options.
+- Moved local registry, generated inventory, Dashboard state, evidence, adoption queue, rollback archives, traces, and rendered HTML out of public Git.
+- Replaced concrete runtime decisions and reports with sanitized public examples.
+- Rewrote the public `main` history as a single sanitized root commit.
 
 ### 2026-08-25 Governance hardening
 
 - Added machine-readable execution stages, failure taxonomy, evidence binding, freshness controls, and recovery semantics.
-- Added detailed Dashboard tab architecture and Checklist statistics.
+- Added detailed Dashboard tab architecture, Checklist statistics, and lineage views.
+- Added local inventory, Dashboard, validator, and rollback generators.
 
 ## Public repository rule
 
-Policy, schemas, generators, and anonymized examples may be committed. Personal project names, local paths, generated runtime reports, rendered HTML, credentials, and production details may not.
+Policy, schemas, generators, and anonymized examples may be committed. Personal project names, local paths, generated runtime reports, rendered HTML, credentials, traces, and production details may not.
