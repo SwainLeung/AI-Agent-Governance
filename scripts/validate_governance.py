@@ -16,6 +16,7 @@ ALLOWED_STAGES = {
 }
 ALLOWED_STATUSES = {"pass", "warn", "blocked", "unknown", "stale", "not_applicable"}
 ALLOWED_ITEM_STATUSES = {"pending", "in_progress", "blocked", "completed", "not_applicable"}
+REQUIRED_DIRECTORY_AGENT_CONTRACTS = ("config", "docs", "scripts", "decisions", "reports")
 
 
 def load_json(path: Path, errors: list[str]) -> dict:
@@ -179,6 +180,18 @@ def validate_references(root: Path, status: dict, checklist: dict, errors: list[
                 errors.append(f"rollback manifest archive does not resolve: {archive_ref}")
 
 
+def validate_documentation_contracts(root: Path, errors: list[str]) -> None:
+    for filename in ("README.md", "AGENTS.md"):
+        if not (root / filename).is_file():
+            errors.append(f"documentation contract missing: {filename}")
+    if not (root / "docs" / "DOCUMENTATION-CONTRACT.md").is_file():
+        errors.append("documentation contract missing: docs/DOCUMENTATION-CONTRACT.md")
+    for directory in REQUIRED_DIRECTORY_AGENT_CONTRACTS:
+        contract = root / directory / "AGENTS.md"
+        if not contract.is_file():
+            errors.append(f"directory Agent contract missing: {directory}/AGENTS.md")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -196,6 +209,7 @@ def main() -> int:
     checklist_summary = validate_checklist(root, checklist, errors)
     contract_summary = validate_contract(contract, errors)
     validate_references(root, status, checklist, errors)
+    validate_documentation_contracts(root, errors)
     result = {
         "schema_version": "governance-validation@1.0.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),

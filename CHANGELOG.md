@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### 2026-08-26 Documentation contract layering
+
+- Separated `README.md` orientation responsibilities from `AGENTS.md` Agent operating responsibilities.
+- Added directory-level Agent contracts for configuration, documentation, tooling, decisions, and reports.
+- Added validator coverage so the required directory contracts cannot silently disappear.
+
 ### 2026-08-25 Documentation and public-release update
 
 - Synchronized README, CHECKLIST, and CHANGELOG with the public-policy/private-runtime architecture.

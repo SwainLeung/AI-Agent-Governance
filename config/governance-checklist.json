@@ -87,6 +87,18 @@
       "blind_spots": ["feedback_delay", "false_convergence"]
     },
     {
+      "id": "GOV-P1-004",
+      "priority": "P1",
+      "domain": "documentation_contracts",
+      "title": "Separate README orientation from AGENTS operating contracts",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-004"],
+      "exit_evidence": ["docs/DOCUMENTATION-CONTRACT.md", "config/AGENTS.md", "docs/AGENTS.md", "scripts/AGENTS.md", "decisions/AGENTS.md", "reports/AGENTS.md"],
+      "next_action": "Keep directory contracts synchronized when ownership, authority, privacy, or validation behavior changes.",
+      "blind_spots": ["state_drift", "observability_gap"]
+    },
+    {
       "id": "GOV-P2-001",
       "priority": "P2",
       "domain": "adoption",

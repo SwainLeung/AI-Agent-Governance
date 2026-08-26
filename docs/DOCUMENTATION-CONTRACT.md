@@ -9,6 +9,21 @@
 | `CHECKLIST.md` | executable work queue | owner, status, dependency, exit criteria, evidence path, next action | completion without evidence |
 | `dashboard.html` | read-only projection | current status, freshness, blockers, links to evidence and decisions | authority to publish or replace source records |
 
+## README and AGENTS are complementary
+
+`README.md` is the orientation contract. It explains purpose, boundaries, directory roles, supported entrypoints, and the human operating flow.
+
+`AGENTS.md` is the Agent operating contract. It defines allowed changes, source-of-truth ownership, privacy and mutation boundaries, required checks, and handoff expectations.
+
+The distinction is intentional:
+
+- README answers “what is this and how do I enter it?”
+- AGENTS answers “how may an Agent change it and how must the change be verified?”
+- A directory may have one `AGENTS.md` when its authority, ownership, privacy, or validation behavior differs from the parent directory.
+- Individual source artifacts do not receive their own instruction file by default; the nearest directory contract applies.
+
+The governance repository maintains directory contracts for `config/`, `docs/`, `scripts/`, `decisions/`, and `reports/`. These contracts refine the root [`AGENTS.md`](../AGENTS.md) and must not weaken its public/private boundary or fail-closed rules.
+
 ## Required companion records
 
 Every non-trivial project needs:

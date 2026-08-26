@@ -12,6 +12,7 @@ Status: public template + private-local runtime separation established. Last doc
 - a detailed read-only Dashboard information architecture;
 - local inventory, Dashboard, validation, and rollback generators;
 - sanitized examples that are safe to publish.
+- layered documentation contracts that separate human orientation from Agent operating rules.
 
 This repository defines governance. It does not own project business code, credentials, production logs, external deployment, or publication decisions.
 
@@ -52,12 +53,19 @@ The Dashboard is a read-only projection. It cannot approve, publish, deploy, or 
 
 ## Repository map
 
-- `config/` - public contracts, templates, and Dashboard information architecture.
-- `docs/` - system model, execution chain, human review, security, migration, and Dashboard design.
-- `scripts/` - local inventory, Dashboard, validation, and rollback tooling.
-- `decisions/` - sanitized public examples only; real decisions belong to ignored local runtime records.
-- `reports/` - public report policy and sanitized assessments; generated runtime reports are ignored.
+- `AGENTS.md` - repository-wide Agent operating contract and public/private boundary.
+- `config/` - public contracts, templates, and Dashboard information architecture; see `config/AGENTS.md`.
+- `docs/` - system model, execution chain, human review, security, migration, and Dashboard design; see `docs/AGENTS.md`.
+- `scripts/` - local inventory, Dashboard, validation, and rollback tooling; see `scripts/AGENTS.md`.
+- `decisions/` - sanitized public examples only; real decisions belong to ignored local runtime records; see `decisions/AGENTS.md`.
+- `reports/` - public report policy and sanitized assessments; generated runtime reports are ignored; see `reports/AGENTS.md`.
 - `STATUS.json` - public template state; local runtime may use ignored `STATUS.local.json`.
+
+## README and AGENTS distinction
+
+`README.md` explains what a project or directory is for and how a human should enter it. `AGENTS.md` explains how an Agent may work there, which artifact is authoritative, what privacy and mutation boundaries apply, and how to verify a change. They are complementary: README is orientation, while AGENTS is enforcement-oriented operating context.
+
+The repository uses directory-level contracts instead of one instruction file per source artifact. A child `AGENTS.md` may narrow responsibilities and checks for its directory, but it cannot override the root public/private boundary, approval rules, or fail-closed requirements.
 
 ## Local workflow
 
@@ -85,6 +93,7 @@ Before merging a public change:
 
 - run the public-template validator;
 - run the local validator when a private registry is available;
+- update the nearest `AGENTS.md` when ownership, authority, privacy, or validation behavior changes;
 - scan the staged public tree for local paths, project identifiers, credentials, and generated runtime files;
 - keep rendered HTML and runtime reports ignored;
 - update README, CHANGELOG, and CHECKLIST when behavior or boundaries change.

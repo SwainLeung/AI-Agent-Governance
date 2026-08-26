@@ -2,7 +2,7 @@
 
 The machine-readable source is `config/governance-checklist.json`. This document is the public work-queue projection; private project adoption details stay in ignored local runtime reports.
 
-## Current state — 2026-08-25
+## Current state — 2026-08-26
 
 | ID | Priority | Domain | Status | Exit evidence | Next action |
 |---|---|---|---|---|---|
@@ -13,6 +13,7 @@ The machine-readable source is `config/governance-checklist.json`. This document
 | GOV-P1-001 | P1 | Reconciliation | completed | inventory generator and drift fields | Schedule pre-write and quarterly reconciliation. |
 | GOV-P1-002 | P1 | Dashboard | completed | tab configuration and local projection generator | Keep rendered HTML private. |
 | GOV-P1-003 | P1 | Feedback | completed | observation and feedback requirements | Require observation reports after external writes. |
+| GOV-P1-004 | P1 | Documentation contracts | completed | README/AGENTS contract and directory AGENTS files | Keep orientation and Agent operating rules separate. |
 | GOV-P2-001 | P2 | Adoption | in_progress | private local adoption queue and project records | Start with the highest-risk registered project. |
 | GOV-P2-002 | P2 | Review | pending | private quarterly review report | Schedule after adoption starts. |
 

@@ -9,6 +9,14 @@ last_modified: "2026-08-25"
 
 This public repository contains policy, schemas, generators, and sanitized examples for AI Agent governance.
 
+## Documentation hierarchy
+
+- `README.md` is the stable orientation layer: purpose, boundaries, repository map, and entrypoints.
+- `AGENTS.md` is the operational contract layer: what an Agent may change, what must remain private, and which checks are required.
+- The nearest `AGENTS.md` governs work in its directory. Directory contracts refine this file; they do not weaken its public/private boundary or fail-closed rules.
+- Key directory contracts live in `config/AGENTS.md`, `docs/AGENTS.md`, `scripts/AGENTS.md`, `decisions/AGENTS.md`, and `reports/AGENTS.md`.
+- Do not create one `AGENTS.md` per artifact. Add a directory contract only where ownership, authority, privacy, or validation behavior differs.
+
 ## Public/private boundary
 
 - Public Git may contain policy, execution contracts, schemas, tab definitions, generators, and anonymized examples.
