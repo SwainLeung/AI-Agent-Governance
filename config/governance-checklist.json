@@ -99,6 +99,18 @@
       "blind_spots": ["state_drift", "observability_gap"]
     },
     {
+      "id": "GOV-P1-005",
+      "priority": "P1",
+      "domain": "project_operations",
+      "title": "Classify project execution scope and enforce the start/switch gate",
+      "status": "in_progress",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P1-004"],
+      "exit_evidence": ["config/project-operation-policy.json", "docs/PROJECT-START-SWITCH.md", "scripts/prepare_project_context.py"],
+      "next_action": "Assign execution_scope to every private registered project and run the preflight before each start or switch.",
+      "blind_spots": ["hidden_coupling", "observability_gap", "adoption_gap"]
+    },
+    {
       "id": "GOV-P2-001",
       "priority": "P2",
       "domain": "adoption",

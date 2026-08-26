@@ -11,6 +11,7 @@ from pathlib import Path
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_REGISTRY_NAME = "project-roots.local.json"
 DEFAULT_OUTPUT_DIR = Path("reports/local")
+ALLOWED_EXECUTION_SCOPES = {"governance_root_only", "project_root_execution"}
 
 
 def read_json(path: Path) -> dict:
@@ -54,6 +55,8 @@ def state_snapshot(path: Path, state_files: list[str]) -> dict:
 
 def project_record(item: dict) -> dict:
     path = Path(str(item["path"]))
+    execution_scope = item.get("execution_scope")
+    scope_known = execution_scope in ALLOWED_EXECUTION_SCOPES
     docs = {name: (path / name).is_file() for name in ("README.md", "CHANGELOG.md", "CHECKLIST.md", "AGENTS.md")}
     reports = path / "reports"
     state_files = []
@@ -84,6 +87,7 @@ def project_record(item: dict) -> dict:
         "path": str(path),
         "role": item.get("role"),
         "risk_tier": item.get("risk_tier"),
+        "execution_scope": execution_scope if scope_known else None,
         "exists": path.is_dir(),
         "documentation": docs,
         "documentation_score": documentation_score,
@@ -104,6 +108,7 @@ def project_record(item: dict) -> dict:
             *([] if reconciliation_records_present or item.get("risk_tier") == "L1" else ["no_reconciliation_record"]),
             *([] if dashboard else ["no_dashboard_projection"]),
             *([] if docs["AGENTS.md"] else ["no_local_agent_contract"]),
+            *([] if scope_known else ["unclassified_execution_scope"]),
         ],
     }
 
@@ -131,7 +136,7 @@ def main() -> int:
     records = [project_record(item) for item in registry.get("projects", []) if isinstance(item, dict)]
     generated_at = datetime.now(timezone.utc).isoformat()
     result = {
-        "schema_version": "project-governance-inventory@1.1.0",
+        "schema_version": "project-governance-inventory@1.2.0",
         "generated_at": generated_at,
         "scope": "bounded registry only; credential contents excluded; private runtime output",
         "registry_mode": "private-local" if private_mode else "public-template",
@@ -141,6 +146,9 @@ def main() -> int:
             "changelog_present": sum(item["documentation"]["CHANGELOG.md"] for item in records),
             "checklist_present": sum(item["documentation"]["CHECKLIST.md"] for item in records),
             "agent_contract_present": sum(item["documentation"]["AGENTS.md"] for item in records),
+            "governance_root_only": sum(item["execution_scope"] == "governance_root_only" for item in records),
+            "project_root_execution": sum(item["execution_scope"] == "project_root_execution" for item in records),
+            "unclassified_execution_scope": sum(item["execution_scope"] is None for item in records),
             "state_ledger_present": sum(bool(item["state_files"]) for item in records),
             "stale_state_ledger": sum(bool(item["current_state"].get("stale")) for item in records),
             "decision_record_present": sum(item["decision_records_present"] for item in records),
@@ -155,11 +163,11 @@ def main() -> int:
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     lines = ["# Project Governance Inventory", "", f"Generated: {generated_at}", "", "This is a private runtime report. It is ignored by Git.", "", "## Summary", ""]
     lines.extend(f"- {key}: {value}" for key, value in result["summary"].items())
-    lines += ["", "## Project coverage", "", "| Project | Risk | Docs | State | Freshness | Decisions | Rollback | Dashboard | Blind spots |", "|---|---|---:|---|---|---|---|---|---|"]
+    lines += ["", "## Project coverage", "", "| Project | Risk | Execution scope | Docs | State | Freshness | Decisions | Rollback | Dashboard | Blind spots |", "|---|---|---|---:|---|---|---|---|---|---|"]
     for item in records:
         state = item["current_state"]
         freshness = "stale" if state.get("stale") else (f"{state.get('age_hours')}h" if state.get("age_hours") is not None else "unknown")
-        lines.append(f"| {item['project_id']} | {item.get('risk_tier') or '-'} | {item['documentation_score']}/4 | {state.get('stage') or ', '.join(item['state_files']) or 'missing'} | {freshness} | {'yes' if item['decision_records_present'] else 'no'} | {'yes' if item['rollback_records_present'] else 'no'} | {'yes' if item['dashboard_present'] else 'no'} | {', '.join(item['blind_spots']) or '-'} |")
+        lines.append(f"| {item['project_id']} | {item.get('risk_tier') or '-'} | {item.get('execution_scope') or 'unclassified'} | {item['documentation_score']}/4 | {state.get('stage') or ', '.join(item['state_files']) or 'missing'} | {freshness} | {'yes' if item['decision_records_present'] else 'no'} | {'yes' if item['rollback_records_present'] else 'no'} | {'yes' if item['dashboard_present'] else 'no'} | {', '.join(item['blind_spots']) or '-'} |")
     (output_dir / "project-governance-inventory.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     from build_governance_dashboard import build_dashboard
 

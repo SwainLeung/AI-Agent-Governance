@@ -11,6 +11,7 @@ This directory contains public machine-readable contracts, schemas, templates, a
 - Update the consuming documentation and generators when a contract field or meaning changes.
 - Prefer explicit enums, required fields, and fail-closed defaults over permissive inference.
 - Keep `project-roots.json` generic; private registrations belong only in the ignored local registry.
+- Keep `project-operation-policy.json` as the public source for execution scopes and startup/switch gates; project-specific scope assignments belong only in the private registry.
 
 ## Verification
 

@@ -17,6 +17,7 @@ ALLOWED_STAGES = {
 ALLOWED_STATUSES = {"pass", "warn", "blocked", "unknown", "stale", "not_applicable"}
 ALLOWED_ITEM_STATUSES = {"pending", "in_progress", "blocked", "completed", "not_applicable"}
 REQUIRED_DIRECTORY_AGENT_CONTRACTS = ("config", "docs", "scripts", "decisions", "reports")
+ALLOWED_EXECUTION_SCOPES = {"governance_root_only", "project_root_execution"}
 
 
 def load_json(path: Path, errors: list[str]) -> dict:
@@ -152,6 +153,39 @@ def validate_contract(contract: dict, errors: list[str]) -> dict:
     return {"stage_count": len(stage_ids), "failure_class_count": len(failures) if isinstance(failures, list) else 0}
 
 
+def validate_operation_policy(root: Path, policy: dict, errors: list[str]) -> dict:
+    modes = policy.get("execution_scopes")
+    if not isinstance(modes, dict):
+        errors.append("project-operation-policy.json: execution_scopes must be an object")
+        return {"scope_count": 0}
+    for scope in ALLOWED_EXECUTION_SCOPES:
+        mode = modes.get(scope)
+        if not isinstance(mode, dict):
+            errors.append(f"project-operation-policy.json: missing execution scope {scope}")
+            continue
+        for field in ("enter_project_root", "execute_project_commands", "required_preflight", "stable_files_to_check", "state_files_to_refresh", "change_record"):
+            if field not in mode:
+                errors.append(f"project-operation-policy.json.{scope}: missing field {field}")
+    gate = policy.get("startup_switch_gate")
+    if not isinstance(gate, dict):
+        errors.append("project-operation-policy.json: startup_switch_gate must be an object")
+    else:
+        for field in ("required_before_every_start_or_switch", "stable_file_rule", "unknown_scope_action"):
+            if field not in gate:
+                errors.append(f"project-operation-policy.json.startup_switch_gate: missing field {field}")
+    if policy.get("default_unclassified_action") != "blocked":
+        errors.append("project-operation-policy.json: default_unclassified_action must be blocked")
+    if policy.get("required_registry_field") != "execution_scope":
+        errors.append("project-operation-policy.json: required_registry_field must be execution_scope")
+    registry = load_json(root / "config" / "project-roots.json", errors)
+    allowed = registry.get("allowed_execution_scopes")
+    if set(allowed or []) != ALLOWED_EXECUTION_SCOPES:
+        errors.append("project-roots.json: allowed_execution_scopes must match project-operation-policy.json")
+    if registry.get("operation_policy_file") != "config/project-operation-policy.json":
+        errors.append("project-roots.json: operation_policy_file must reference config/project-operation-policy.json")
+    return {"scope_count": len(modes)}
+
+
 def validate_references(root: Path, status: dict, checklist: dict, errors: list[str]) -> None:
     refs = list(status.get("source_refs", [])) + list(status.get("evidence", []))
     for item in checklist.get("items", []):
@@ -205,9 +239,11 @@ def main() -> int:
     status = load_json(status_path, errors)
     checklist = load_json(root / "config" / "governance-checklist.json", errors)
     contract = load_json(root / "config" / "execution-contract.json", errors)
+    operation_policy = load_json(root / "config" / "project-operation-policy.json", errors)
     freshness = validate_status(root, status, errors, warnings)
     checklist_summary = validate_checklist(root, checklist, errors)
     contract_summary = validate_contract(contract, errors)
+    operation_policy_summary = validate_operation_policy(root, operation_policy, errors)
     validate_references(root, status, checklist, errors)
     validate_documentation_contracts(root, errors)
     result = {
@@ -220,6 +256,7 @@ def main() -> int:
         "freshness": freshness,
         "checklist": checklist_summary,
         "execution_contract": contract_summary,
+        "operation_policy": operation_policy_summary,
     }
     if args.output:
         output = args.output if args.output.is_absolute() else root / args.output

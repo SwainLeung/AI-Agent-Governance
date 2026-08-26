@@ -52,6 +52,7 @@ def build_adoption_queue(projects: list[dict], evidence_ref: str) -> list[dict]:
         "no_reconciliation_record": "external_reconciliation",
         "no_dashboard_projection": "read_only_dashboard_projection",
         "no_local_agent_contract": "local_agent_contract",
+        "unclassified_execution_scope": "execution_scope",
     }
     queue = []
     for project in projects:
@@ -66,6 +67,7 @@ def build_adoption_queue(projects: list[dict], evidence_ref: str) -> list[dict]:
             project.get("current_state", {}).get("present")
             and project.get("documentation", {}).get("AGENTS.md")
             and project.get("evidence_sample")
+            and project.get("execution_scope")
         )
         queue.append({
             "queue_id": f"ADOPT-{project['project_id']}",
@@ -127,7 +129,9 @@ def build_state(root: Path, output_dir: Path, private_mode: bool = True) -> dict
             f"{report_prefix}/project-governance-inventory.json",
             "config/governance-checklist.json",
             "config/execution-contract.json",
+            "config/project-operation-policy.json",
             "config/dashboard-tabs.json",
+            "docs/PROJECT-START-SWITCH.md",
             "STATUS.json",
         ],
         "tabs": tabs.get("tabs", []) if isinstance(tabs, dict) else [],
@@ -194,7 +198,7 @@ def render_dashboard(state: dict, root: Path) -> None:
     for item in projects:
         current = item.get("current_state", {})
         first_gap = item.get("blind_spots", ["-"])[0] if item.get("blind_spots") else "-"
-        project_rows.append([item.get("project_id"), item.get("risk_tier"), current.get("stage") or "missing", current.get("status") or "unknown", "stale" if current.get("stale") else "fresh/unknown", first_gap])
+        project_rows.append([item.get("project_id"), item.get("risk_tier"), item.get("execution_scope") or "unclassified", current.get("stage") or "missing", current.get("status") or "unknown", "stale" if current.get("stale") else "fresh/unknown", first_gap])
     checklist_rows = [[item.get("id"), item.get("priority"), item.get("domain"), badge(item.get("status"), "good" if item.get("status") == "completed" else "warn" if item.get("status") in {"in_progress", "pending"} else "bad"), item.get("owner"), item.get("next_action")] for item in state["checklist"]]
     adoption_rows = [[item.get("queue_id"), item.get("risk_tier"), item.get("priority"), badge(item.get("status"), "good" if item.get("status") == "preflight_complete" else "warn"), ", ".join(item.get("missing_controls", [])), item.get("first_action")] for item in state["adoption_queue"]]
     blind_rows = [[item["name"], item["count"], "system-theory / execution-chain"] for item in state["blindspots"]]
@@ -214,7 +218,7 @@ def render_dashboard(state: dict, root: Path) -> None:
 
     panels = {
         "overview": f'''<section class="view active" data-view-panel="overview"><div class="hero"><div><div class="eyebrow">Policy plane · read-only</div><h1>AI Agent Governance</h1><p>展示治理状态、执行链、Checklist、证据与跨项目 TODO。Dashboard 只投影机器可读源，不执行审批或外部写入。</p><p class="muted">Generated {esc(state["generated_at"])} · Current state {esc(state["architecture"]["current_stage"])} / {esc(state["architecture"]["current_status"])}</p></div><div class="hero-badge">{badge("READ ONLY", "good")}</div></div><div class="stats"><div class="stat"><small>Registered projects</small><strong>{summary.get("project_count", 0)}</strong><span>bounded registry</span></div><div class="stat"><small>Checklist</small><strong>{checklist.get("completed", 0)}/{checklist.get("total", 0)}</strong><span>{checklist.get("completion_percent", 0)}% completed</span></div><div class="stat"><small>Adoption TODO</small><strong>{summary.get("adoption_queue_total", 0)}</strong><span>L3 {summary.get("adoption_l3", 0)} · L2 {summary.get("adoption_l2", 0)}</span></div><div class="stat"><small>Blind spots</small><strong>{summary.get("projects_with_blind_spots", 0)}</strong><span>{summary.get("blindspot_type_count", 0)} types</span></div><div class="stat"><small>Stale ledgers</small><strong>{summary.get("stale_state_ledger", 0)}</strong><span>unknown is not pass</span></div></div><div class="grid-2"><article class="card accent-green"><h2>Next decision</h2><p>Start with the highest-risk adoption queue. Each project first receives a state ledger and evidence index, then moves through decision, rollback, and reconciliation gates.</p><div class="links"><a href="CHECKLIST.md">Checklist</a><a href="{report_prefix}/governance-adoption-queue.json">Adoption queue</a><a href="{report_prefix}/governance-dashboard-state.json">Dashboard state</a></div></article><article class="card accent-teal"><h2>Control-loop status</h2><p>Execution contract: {summary.get("execution_stage_count", 0)} stages · Failure taxonomy: {summary.get("failure_class_count", 0)} classes · Decision records: {summary.get("decision_record_present", 0)} · Rollback records: {summary.get("rollback_record_present", 0)}</p><div class="pill-row">{badge("freshness-aware", "good")}{badge("fail-closed", "good")}{badge("evidence-bound", "good")}{badge("human review", "warn")}</div></article></div></section>''',
-        "projects": f'''<section class="view" data-view-panel="projects"><div class="hero"><div><div class="eyebrow">02 · Projects</div><h1>Project inventory</h1><p>项目风险、当前阶段、状态新鲜度和首个盲点。</p></div></div>{table(["Project", "Risk", "Stage", "Status", "Freshness", "First gap"], project_rows)}</section>''',
+        "projects": f'''<section class="view" data-view-panel="projects"><div class="hero"><div><div class="eyebrow">02 · Projects</div><h1>Project inventory</h1><p>项目风险、执行范围、当前阶段、状态新鲜度和首个盲点。</p></div></div>{table(["Project", "Risk", "Execution scope", "Stage", "Status", "Freshness", "First gap"], project_rows)}</section>''',
         "governance-audit": f'''<section class="view" data-view-panel="governance-audit"><div class="hero"><div><div class="eyebrow">03 · Governance audit</div><h1>System-theory blind spots</h1><p>盲点计数来自注册项目库存；缺失数据保持为 unknown / TODO，不自动转绿。</p></div></div><div class="grid-3"><div class="stat"><small>Projects with blind spots</small><strong>{summary.get("projects_with_blind_spots", 0)}</strong><span>not completion</span></div><div class="stat"><small>Blind-spot types</small><strong>{summary.get("blindspot_type_count", 0)}</strong><span>drift / evidence / coupling</span></div><div class="stat"><small>Reconciliation records</small><strong>{summary.get("reconciliation_record_present", 0)}</strong><span>L2/L3 must add them</span></div></div>{table(["Blind spot", "Count", "Control family"], blind_rows)}</section>''',
         "features": f'''<section class="view" data-view-panel="features"><div class="hero"><div><div class="eyebrow">04 · Features</div><h1>Governance capabilities</h1><p>能力状态、所属类别和 SSOT 来源。</p></div></div>{table(["Feature", "Status", "Category", "Source"], feature_rows)}</section>''',
         "functions": f'''<section class="view" data-view-panel="functions"><div class="hero"><div><div class="eyebrow">05 · Functions</div><h1>Executable functions</h1><p>函数入口、触发条件、输出和审批边界。</p></div></div>{table(["Function", "Status", "Trigger", "Entrypoint", "Output", "Approval boundary"], function_rows)}</section>''',

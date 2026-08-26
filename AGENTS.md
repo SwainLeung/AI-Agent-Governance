@@ -32,4 +32,13 @@ This public repository contains policy, schemas, generators, and sanitized examp
 4. Run `python scripts/validate_governance.py` before handoff.
 5. Record unresolved adoption gaps in private runtime reports, never as hidden completion.
 
+## Project start and switch gate
+
+Before every project start or context switch, run `python scripts/prepare_project_context.py --project-id <id> --reason "<reason>"` from this repository root. The command resolves the explicit `execution_scope`, checks the root contract, and writes a private startup context report.
+
+- `governance_root_only`: remain in this repository, refresh governance state, and do not execute project commands.
+- `project_root_execution`: enter the registered project root only after the governance preflight passes; check its nearest `AGENTS.md` and `README.md`, refresh its checklist/state, and then run project commands there.
+- Missing or unknown scope blocks project execution.
+- README and AGENTS are checked at each transition; they are changed only when their content changes. CHANGELOG records actual changes, not routine context switches.
+
 The Dashboard is a local read-only projection. Its source configuration and generator are public; its rendered HTML and private runtime data are not.

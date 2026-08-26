@@ -18,14 +18,17 @@ DEFAULT_FILES = (
     "STATUS.json",
     "dashboard.html",
     "config/project-roots.json",
+    "config/project-operation-policy.json",
     "config/project-governance.schema.json",
     "config/execution-contract.json",
     "config/governance-checklist.json",
     "config/dashboard-tabs.json",
     "docs/GOVERNANCE-DASHBOARD-DESIGN.md",
+    "docs/PROJECT-START-SWITCH.md",
     "scripts/build_governance_inventory.py",
     "scripts/build_governance_dashboard.py",
     "scripts/validate_governance.py",
+    "scripts/prepare_project_context.py",
 )
 
 

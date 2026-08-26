@@ -14,6 +14,7 @@ The machine-readable source is `config/governance-checklist.json`. This document
 | GOV-P1-002 | P1 | Dashboard | completed | tab configuration and local projection generator | Keep rendered HTML private. |
 | GOV-P1-003 | P1 | Feedback | completed | observation and feedback requirements | Require observation reports after external writes. |
 | GOV-P1-004 | P1 | Documentation contracts | completed | README/AGENTS contract and directory AGENTS files | Keep orientation and Agent operating rules separate. |
+| GOV-P1-005 | P1 | Project operations | in_progress | execution-scope policy, start/switch gate, private context preflight | Classify every private registered project before running project commands. |
 | GOV-P2-001 | P2 | Adoption | in_progress | private local adoption queue and project records | Start with the highest-risk registered project. |
 | GOV-P2-002 | P2 | Review | pending | private quarterly review report | Schedule after adoption starts. |
 
@@ -35,6 +36,7 @@ The machine-readable source is `config/governance-checklist.json`. This document
 4. Add adapter health and reconciliation summaries that contain no raw logs or credentials.
 5. Add observation-window and post-release feedback metrics.
 6. Run and record the first private quarterly governance drift review.
+7. Assign `execution_scope` to every private registered project and run the start/switch preflight before project commands.
 
 ## Completion rule
 

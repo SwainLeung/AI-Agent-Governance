@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### 2026-08-26 Project start and switch gate
+
+- Added explicit `governance_root_only` and `project_root_execution` scopes for registered projects.
+- Added a fail-closed private preflight for every project start or context switch.
+- Extended inventory and Dashboard coverage to expose unclassified execution scopes.
+- Kept README/AGENTS verification separate from state refresh and actual CHANGELOG events.
+
 ### 2026-08-26 Documentation contract layering
 
 - Separated `README.md` orientation responsibilities from `AGENTS.md` Agent operating responsibilities.

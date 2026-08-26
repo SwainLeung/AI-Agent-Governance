@@ -34,7 +34,14 @@ Private local runtime contains:
 - generated inventory, Dashboard state, adoption queue, evidence, and rollback archives;
 - rendered `dashboard.html`.
 
-The local registry belongs in ignored `config/project-roots.local.json`. The public `config/project-roots.json` contains only registration fields, allowed roles, risk tiers, and privacy instructions.
+The local registry belongs in ignored `config/project-roots.local.json`. The public `config/project-roots.json` contains only registration fields, allowed roles, risk tiers, execution-scope options, and privacy instructions.
+
+Each registered project must also declare an `execution_scope` from `config/project-operation-policy.json`:
+
+- `governance_root_only` — operate and refresh governance state at this repository root; do not enter or execute project commands in the target project.
+- `project_root_execution` — pass the governance-root preflight, then enter the registered project root and execute only within its local contract.
+
+An omitted or unknown scope is blocked. Before every project start or switch, check the root `README.md`/`AGENTS.md`, refresh the relevant `CHECKLIST`/`STATUS`, and record the private startup context. Stable README/AGENTS files are verified every time but edited only when their content changes. See [Project start and switch gate](docs/PROJECT-START-SWITCH.md).
 
 ## Operating flow
 

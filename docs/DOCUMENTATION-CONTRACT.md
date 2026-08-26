@@ -24,6 +24,16 @@ The distinction is intentional:
 
 The governance repository maintains directory contracts for `config/`, `docs/`, `scripts/`, `decisions/`, and `reports/`. These contracts refine the root [`AGENTS.md`](../AGENTS.md) and must not weaken its public/private boundary or fail-closed rules.
 
+## Project start and switch records
+
+Project operation is classified in `config/project-operation-policy.json` and selected per project in the private registry:
+
+- `governance_root_only` keeps the work at the governance repository root and forbids project commands.
+- `project_root_execution` requires a passing governance-root preflight before entering the registered project root.
+- An omitted or unknown `execution_scope` is blocked until explicitly classified.
+
+Before every start or switch, verify the applicable README and AGENTS files, refresh the relevant CHECKLIST and STATUS state when the context changes, and write a private startup context record. CHANGELOG is updated only for an actual change event; stable orientation and operating contracts are not rewritten merely because a project was selected.
+
 ## Required companion records
 
 Every non-trivial project needs:

@@ -1,0 +1,37 @@
+{
+  "schema_version": "project-operation-policy@1.0.0",
+  "default_unclassified_action": "blocked",
+  "execution_scopes": {
+    "governance_root_only": {
+      "label": "Governance root only",
+      "enter_project_root": false,
+      "execute_project_commands": false,
+      "required_preflight": "governance_root",
+      "stable_files_to_check": ["AGENTS.md", "README.md"],
+      "state_files_to_refresh": ["CHECKLIST.md", "STATUS.local.json or STATUS.json"],
+      "change_record": "Append CHANGELOG.md only when a real change occurs."
+    },
+    "project_root_execution": {
+      "label": "Enter project root and execute",
+      "enter_project_root": true,
+      "execute_project_commands": true,
+      "required_preflight": "governance_root_then_project_root",
+      "stable_files_to_check": ["AGENTS.md", "README.md"],
+      "state_files_to_refresh": ["CHECKLIST.md", "STATUS.json or equivalent"],
+      "change_record": "Append the project CHANGELOG.md only when a real change occurs."
+    }
+  },
+  "startup_switch_gate": {
+    "required_before_every_start_or_switch": [
+      "Resolve the registered project and explicit execution_scope.",
+      "At the governance root, check the root AGENTS.md and README.md and refresh the current queue/state when context changes.",
+      "For project_root_execution, enter the project root only after the governance preflight passes.",
+      "At the project root, check its nearest AGENTS.md and README.md and refresh its checklist/state before project commands.",
+      "Record the selected project, scope, reason, timestamps, and checked files in the private startup context report."
+    ],
+    "stable_file_rule": "Read and verify README.md and AGENTS.md every time; write them only when their content changes.",
+    "unknown_scope_action": "Block project commands and request explicit classification in the private registry."
+  },
+  "required_registry_field": "execution_scope",
+  "registry_reference": "config/project-roots.json"
+}
