@@ -11,6 +11,15 @@
       "state_files_to_refresh": ["CHECKLIST.md", "STATUS.local.json or STATUS.json"],
       "change_record": "Append CHANGELOG.md only when a real change occurs."
     },
+    "governance_observation": {
+      "label": "Read-only governance observation",
+      "enter_project_root": false,
+      "execute_project_commands": false,
+      "required_preflight": "governance_root_observation",
+      "stable_files_to_check": ["AGENTS.md", "README.md"],
+      "state_files_to_refresh": [],
+      "change_record": "Write only private observation evidence; do not mutate the target project."
+    },
     "project_root_execution": {
       "label": "Enter project root and execute",
       "enter_project_root": true,
@@ -30,7 +39,35 @@
       "Record the selected project, scope, reason, timestamps, and checked files in the private startup context report."
     ],
     "stable_file_rule": "Read and verify README.md and AGENTS.md every time; write them only when their content changes.",
-    "unknown_scope_action": "Block project commands and request explicit classification in the private registry."
+    "unknown_scope_action": "Block project commands and request explicit classification in the private registry.",
+    "observation_exception": "governance_observation may inspect a registered target and record missing or unknown controls without project commands, target mutation, or human approval."
+  },
+  "permission_envelopes": {
+    "goal": {
+      "label": "Bounded goal write authority",
+      "writes_authorized": true,
+      "gate_behavior": "advisory",
+      "requires_post_run_report": true,
+      "requires_human_follow_up": true,
+      "does_not_authorize": ["scope expansion", "unrecorded writes", "automatic governance-source updates"]
+    },
+    "full_access": {
+      "allowed_execution_scope": "project_root_execution",
+      "preflight_required": true,
+      "allows_direct_project_commands": true,
+      "writes_authorized": true,
+      "gate_behavior": "advisory",
+      "requires_post_run_report": true,
+      "requires_human_follow_up": true,
+      "does_not_authorize": ["scope expansion", "unrecorded writes", "bypassing the project AGENTS.md"]
+    },
+    "restricted": {
+      "writes_authorized": false,
+      "gate_behavior": "enforced",
+      "requires_post_run_report": true,
+      "requires_human_follow_up": false,
+      "does_not_authorize": ["project writes", "external writes", "automatic governance-source updates"]
+    }
   },
   "required_registry_field": "execution_scope",
   "registry_reference": "config/project-roots.json"

@@ -23,7 +23,7 @@ intent
  -> expanded | adjusted | rolled_back
 ```
 
-External writes require `human_review` approval bound to the exact artifact and scope. Failure, timeout, stale evidence, or unknown state must enter `blocked` or `recovery`, never `pass`.
+In restricted execution, external writes require `human_review` approval bound to the exact artifact and scope. In explicitly authorized `goal` or `full_access` execution, failure, timeout, stale evidence, or unknown state is recorded as a warning/risk and does not automatically stop bounded execution; the post-run report must identify the issue and propose human follow-up.
 
 ## Systems-theory blind spots to control
 
@@ -42,12 +42,12 @@ The policy plane must observe itself as well as downstream projects. The governa
 
 Each control loop records four distinct timestamps when applicable: intent time, artifact time, decision time, and live-observation time. A newer timestamp does not prove a later stage succeeded; the stage exit evidence remains authoritative.
 
-Before an external write, the loop must compare the approved scope and artifact hash with the current plan, check freshness and dependencies, and reconcile the last known external state. If any comparison is unknown, the loop enters `blocked` or `recovery` and fails closed.
+Before an external write in restricted execution, the loop must compare the approved scope and artifact hash with the current plan, check freshness and dependencies, and reconcile the last known external state. In goal/full_access execution, failed or unknown comparisons become recorded warnings and risks rather than automatic blockers, while scope identity and write traceability remain required.
 
 ## Invariants
 
 - No secret in source, reports, logs, Dashboard, or changelog.
-- No external mutation without an explicit adapter and approval.
+- No external mutation in restricted execution without an explicit adapter and approval; goal/full_access execution must still use the resolved adapter path and record the authority, warnings, risks, and follow-up report.
 - No `pass` when required evidence is missing or stale.
 - Every status has an owner, timestamp, source, and next action.
 - Every write has a before/after hash and rollback reference.

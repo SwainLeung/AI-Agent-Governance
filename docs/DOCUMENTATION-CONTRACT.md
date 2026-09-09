@@ -29,6 +29,7 @@ The governance repository maintains directory contracts for `config/`, `docs/`, 
 Project operation is classified in `config/project-operation-policy.json` and selected per project in the private registry:
 
 - `governance_root_only` keeps the work at the governance repository root and forbids project commands.
+- `governance_observation` permits read-only inspection of a registered target and recording missing or unknown controls as evidence; it does not permit target commands or mutation.
 - `project_root_execution` requires a passing governance-root preflight before entering the registered project root.
 - An omitted or unknown `execution_scope` is blocked until explicitly classified.
 

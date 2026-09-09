@@ -1,0 +1,24 @@
+{
+  "name": "governance",
+  "version": "0.1.0+codex.20260829024736",
+  "description": "Checklist-to-goal commands for AI Agent Governance",
+  "author": {
+    "name": "AI Agent Governance maintainers"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Governance",
+    "shortDescription": "Claim and advance governed checklist goals.",
+    "longDescription": "Adds deterministic checklist commands that claim one bounded goal and advance it only with explicit evidence-backed outcomes.",
+    "developerName": "AI Agent Governance maintainers",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Claim the next governance checklist goal.",
+      "Advance a governance checklist goal with verified evidence."
+    ]
+  }
+}

@@ -11,7 +11,7 @@ from pathlib import Path
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_REGISTRY_NAME = "project-roots.local.json"
 DEFAULT_OUTPUT_DIR = Path("reports/local")
-ALLOWED_EXECUTION_SCOPES = {"governance_root_only", "project_root_execution"}
+ALLOWED_EXECUTION_SCOPES = {"governance_root_only", "governance_observation", "project_root_execution"}
 
 
 def read_json(path: Path) -> dict:
@@ -27,12 +27,14 @@ def state_snapshot(path: Path, state_files: list[str]) -> dict:
         return {"present": False, "stale": False}
     state = read_json(path / state_files[0])
     generated_at = state.get("generated_at")
+    last_verified_at = state.get("last_verified_at")
+    freshness_timestamp = last_verified_at or generated_at
     ttl = state.get("freshness_ttl_hours", 24)
     stale = False
     age_hours = None
-    if isinstance(generated_at, str):
+    if isinstance(freshness_timestamp, str):
         try:
-            generated = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+            generated = datetime.fromisoformat(freshness_timestamp.replace("Z", "+00:00"))
             if generated.tzinfo is not None:
                 age_hours = round((datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600, 2)
                 stale = age_hours > float(ttl)
@@ -44,6 +46,8 @@ def state_snapshot(path: Path, state_files: list[str]) -> dict:
         "stage": state.get("stage"),
         "status": state.get("status"),
         "generated_at": generated_at,
+        "last_verified_at": last_verified_at,
+        "freshness_source": "last_verified_at" if last_verified_at else "generated_at",
         "freshness_ttl_hours": ttl,
         "age_hours": age_hours,
         "stale": stale,
@@ -60,7 +64,7 @@ def project_record(item: dict) -> dict:
     docs = {name: (path / name).is_file() for name in ("README.md", "CHANGELOG.md", "CHECKLIST.md", "AGENTS.md")}
     reports = path / "reports"
     state_files = []
-    for name in ("STATUS.json", "status.json", "project-state.json", "pipeline-state.json"):
+    for name in ("STATUS.local.json", "STATUS.json", "status.json", "project-state.json", "pipeline-state.json"):
         candidate = path / name
         if candidate.is_file() and candidate.name.lower() not in {item.lower() for item in state_files}:
             state_files.append(candidate.name)
@@ -147,6 +151,7 @@ def main() -> int:
             "checklist_present": sum(item["documentation"]["CHECKLIST.md"] for item in records),
             "agent_contract_present": sum(item["documentation"]["AGENTS.md"] for item in records),
             "governance_root_only": sum(item["execution_scope"] == "governance_root_only" for item in records),
+            "governance_observation": sum(item["execution_scope"] == "governance_observation" for item in records),
             "project_root_execution": sum(item["execution_scope"] == "project_root_execution" for item in records),
             "unclassified_execution_scope": sum(item["execution_scope"] is None for item in records),
             "state_ledger_present": sum(bool(item["state_files"]) for item in records),

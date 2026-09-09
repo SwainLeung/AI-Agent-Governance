@@ -37,8 +37,11 @@ This public repository contains policy, schemas, generators, and sanitized examp
 Before every project start or context switch, run `python scripts/prepare_project_context.py --project-id <id> --reason "<reason>"` from this repository root. The command resolves the explicit `execution_scope`, checks the root contract, and writes a private startup context report.
 
 - `governance_root_only`: remain in this repository, refresh governance state, and do not execute project commands.
+- `governance_observation`: inspect a registered target read-only from the governance root; record missing or unknown controls as private evidence, but do not execute project commands or mutate, publish, deploy, or approve the target.
 - `project_root_execution`: enter the registered project root only after the governance preflight passes; check its nearest `AGENTS.md` and `README.md`, refresh its checklist/state, and then run project commands there.
 - Missing or unknown scope blocks project execution.
+- `goal` and `full_access` are explicit write-authorized execution modes. Their normal thresholds and gates are advisory rather than blocking, but every warning, risk, recommendation, and human follow-up item must be recorded. They do not authorize scope expansion or unrecorded writes.
+- Governance-source files are never updated automatically. A requested update requires an approval reference before the write is executed.
 - README and AGENTS are checked at each transition; they are changed only when their content changes. CHANGELOG records actual changes, not routine context switches.
 
 The Dashboard is a local read-only projection. Its source configuration and generator are public; its rendered HTML and private runtime data are not.

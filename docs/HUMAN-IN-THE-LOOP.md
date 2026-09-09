@@ -38,3 +38,5 @@ The Dashboard must make it possible to answer quickly:
 6. How do I reverse it?
 
 Automation may prepare, compare, score, and recommend. It may not silently convert a recommendation into publication.
+
+Human approval is required before a governance-source update is applied. For `restricted` execution, approval and safety gates remain blocking for mutation, publication, deployment, credential-backed action, or another user-visible external effect. For explicitly authorized `goal` or `full_access` execution, those thresholds are advisory and do not automatically stop the bounded task; the agent must record warnings, risks, recommendations, and human follow-up for later confirmation. A source update still requires an explicit request and approval reference.

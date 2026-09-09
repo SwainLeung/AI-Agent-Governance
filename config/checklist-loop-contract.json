@@ -1,0 +1,25 @@
+{
+  "schema_version": "governance-checklist-loop@1.0.0",
+  "source_checklist": "config/governance-checklist.json",
+  "runtime_output_dir": "reports/local/checklist-loop",
+  "selection": {
+    "eligible_statuses": ["in_progress", "pending"],
+    "dependency_statuses": ["completed", "not_applicable"],
+    "priority_order": ["P0", "P1", "P2"],
+    "prefer_in_progress": true
+  },
+  "goal_command": {
+    "required_fields": ["objective", "checklist_item_id", "exit_evidence", "next_action", "run_id"],
+    "creates_private_runtime_record": true,
+    "does_not_execute_project_commands": true,
+    "default_permission_mode": "goal",
+    "required_report_fields": ["warnings", "risks", "recommendations", "human_follow_up"]
+  },
+  "loop_command": {
+    "accepted_outcomes": ["in_progress", "blocked", "completed"],
+    "completed_requires_resolved_exit_evidence": true,
+    "source_checklist_write_requires_explicit_flag": true,
+    "select_next_goal_after_outcome": true,
+    "source_update_requires_approval_ref": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "governance-ledger-refresh-registry@1.0.0",
+  "source_registry": "config/project-roots.local.json",
+  "default_interval_hours": 24,
+  "runtime_registry_output": "reports/local/ledger-refresh/registry.json",
+  "trigger_type": "central_governance_runner",
+  "scan_command": "python scripts/refresh_registered_ledger.py --project-id <project-id>",
+  "apply_command": "python scripts/refresh_registered_ledger.py --project-id <project-id> --apply --approval-ref <approval-ref>",
+  "all_scan_command": "python scripts/register_ledger_refresh.py",
+  "scheduler": {
+    "entrypoint": "scripts/ledger_refresh_scheduler.py",
+    "default_interval_hours": 24,
+    "default_mode": "scan_only",
+    "supports_once": true,
+    "supports_daemon": true,
+    "writes_applied_by_default": false,
+    "heartbeat_output": "reports/local/ledger-refresh/scheduler/state.json"
+  },
+  "source_update_rule": "Registration and scanning are read-only. Applying a project ledger refresh requires an explicit approval reference and writes only fact-like verification fields."
+}

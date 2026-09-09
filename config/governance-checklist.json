@@ -111,6 +111,30 @@
       "blind_spots": ["hidden_coupling", "observability_gap", "adoption_gap"]
     },
     {
+      "id": "GOV-P1-006",
+      "priority": "P1",
+      "domain": "checklist_operations",
+      "title": "Turn eligible checklist items into bounded goals and continue the loop",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P0-002", "GOV-P1-004"],
+      "exit_evidence": ["config/checklist-loop-contract.json", "scripts/checklist_loop.py", "docs/EXECUTION-CHAIN.md"],
+      "next_action": "Use one goal per actionable checklist item and explicitly persist each outcome before selecting the next item.",
+      "blind_spots": ["queue_illusion", "scope_expansion", "false_convergence"]
+    },
+    {
+      "id": "GOV-P1-007",
+      "priority": "P1",
+      "domain": "codex_commands",
+      "title": "Expose bounded checklist goals as Codex slash commands",
+      "status": "completed",
+      "owner": "governance-maintainers",
+      "depends_on": ["GOV-P1-006"],
+      "exit_evidence": [".agents/plugins/marketplace.json", "plugins/governance/.codex-plugin/plugin.json", "plugins/governance/commands/claim-goal.md", "plugins/governance/commands/advance-goal.md"],
+      "next_action": "Install the repo-local governance plugin and use its namespaced commands for each bounded goal cycle.",
+      "blind_spots": ["scope_expansion", "permission_confusion", "queue_illusion"]
+    },
+    {
       "id": "GOV-P2-001",
       "priority": "P2",
       "domain": "adoption",

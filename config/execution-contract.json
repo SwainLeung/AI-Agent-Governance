@@ -1,6 +1,37 @@
 {
   "schema_version": "governance-execution-contract@1.1.0",
   "default_freshness_ttl_hours": 24,
+  "clarification_policy": {
+    "must_request_clarification_when": [
+      "target_or_file_cannot_be_safely_identified",
+      "interpretation_would_expand_permissions_or_scope",
+      "interpretation_would_change_risk_tier_or_completion_criteria",
+      "external_write_or_user_visible_effect_is_possible_without_explicit_authorization"
+    ],
+    "safe_default_when": [
+      "ambiguity_does_not_change_permissions_scope_risk_or_external_effect",
+      "read_only_observation_can_continue_with_a_recorded_assumption"
+    ],
+    "safe_default_action": "continue_minimal_read_only_scope_and_record_assumption"
+  },
+  "execution_authority_policy": {
+    "restricted": {
+      "writes_authorized": false,
+      "gate_behavior": "enforced",
+      "required_report_fields": ["warnings", "risks", "recommendations"]
+    },
+    "goal": {
+      "writes_authorized": true,
+      "gate_behavior": "advisory",
+      "required_report_fields": ["warnings", "risks", "recommendations", "human_follow_up"]
+    },
+    "full_access": {
+      "writes_authorized": true,
+      "gate_behavior": "advisory",
+      "required_report_fields": ["warnings", "risks", "recommendations", "human_follow_up"]
+    },
+    "source_update_rule": "Governance source updates are never automatic; they require an explicit write request and an approval reference before execution."
+  },
   "external_write_policy": {
     "requires_human_review_stage": "human_review",
     "requires_deploy_stage": "deploy",

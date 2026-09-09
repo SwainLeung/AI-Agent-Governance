@@ -13,7 +13,7 @@
     "last_verified_at": {"type": ["string", "null"], "format": "date-time"},
     "freshness_ttl_hours": {"type": "number", "exclusiveMinimum": 0},
     "run_id": {"type": ["string", "null"]},
-    "execution_scope": {"enum": ["governance_root_only", "project_root_execution"]},
+    "execution_scope": {"enum": ["governance_root_only", "governance_observation", "project_root_execution"]},
     "startup_context_ref": {"type": ["string", "null"]},
     "source_refs": {"type": "array", "items": {"type": "string"}},
     "evidence": {"type": "array", "items": {"type": "string"}},

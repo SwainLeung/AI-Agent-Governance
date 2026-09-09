@@ -95,6 +95,11 @@ def main() -> int:
                 ["AGENTS.md", "README.md", "CHECKLIST.md", "STATUS.json or status.json or project-state.json or pipeline-state.json"],
             )
             errors.extend(f"project root file missing: {item}" for item in project_missing)
+    elif scope == "governance_observation":
+        if not project_root or not project_root.is_dir():
+            errors.append("registered project root does not exist; observation cannot proceed")
+        else:
+            project_checked, project_missing = check_files(project_root, ["AGENTS.md", "README.md"])
 
     prepared_at = datetime.now(timezone.utc)
     run_id = f"startup-{safe_token(args.project_id)}-{prepared_at.strftime('%Y%m%dT%H%M%SZ')}"
@@ -113,7 +118,7 @@ def main() -> int:
         "root_files_checked": root_checked,
         "project_files_checked": project_checked,
         "missing": errors,
-        "next_action": "Resolve blockers before project commands." if errors else ("Remain at governance root; no project commands allowed." if scope == "governance_root_only" else "Enter the project root and follow its nearest AGENTS.md before running commands."),
+        "next_action": "Resolve blockers before project commands." if errors else ("Observe the registered project read-only and record missing controls as evidence." if scope == "governance_observation" else ("Remain at governance root; no project commands allowed." if scope == "governance_root_only" else "Enter the project root and follow its nearest AGENTS.md before running commands.")),
     }
     output_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)

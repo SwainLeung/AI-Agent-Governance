@@ -1,0 +1,26 @@
+{
+  "schema_version": "governance-status-refresh-policy@1.0.0",
+  "status_candidates": ["STATUS.local.json", "STATUS.json"],
+  "preferred_private_status": "STATUS.local.json",
+  "interval_hours": 24,
+  "proposal_output_dir": "reports/local/status-refresh",
+  "auto_refresh_fields": [
+    "generated_at",
+    "last_verified_at",
+    "run_id",
+    "evidence",
+    "reconciliation",
+    "metrics",
+    "last_update"
+  ],
+  "protected_fields": [
+    "project_id",
+    "stage",
+    "status",
+    "owner",
+    "next_action",
+    "decision",
+    "rollback_ref"
+  ],
+  "source_update_rule": "Scanning creates a proposal only. Applying a proposal requires an explicit approval reference. Public STATUS.json is never refreshed from private runtime data automatically."
+}

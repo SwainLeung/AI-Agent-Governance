@@ -39,9 +39,29 @@ The local registry belongs in ignored `config/project-roots.local.json`. The pub
 Each registered project must also declare an `execution_scope` from `config/project-operation-policy.json`:
 
 - `governance_root_only` — operate and refresh governance state at this repository root; do not enter or execute project commands in the target project.
+- `governance_observation` — inspect a registered target read-only, record missing or unknown controls, and never mutate, publish, deploy, or approve the target.
 - `project_root_execution` — pass the governance-root preflight, then enter the registered project root and execute only within its local contract.
 
 An omitted or unknown scope is blocked. Before every project start or switch, check the root `README.md`/`AGENTS.md`, refresh the relevant `CHECKLIST`/`STATUS`, and record the private startup context. Stable README/AGENTS files are verified every time but edited only when their content changes. See [Project start and switch gate](docs/PROJECT-START-SWITCH.md).
+
+## Checklist-to-goal loop
+
+Use the checklist loop to turn exactly one actionable machine-readable checklist item into a bounded Codex goal. It writes its run records only under ignored `reports/local/checklist-loop/`; only `loop --write` changes the checklist source, and completion is rejected unless the declared exit-evidence files and dependencies resolve.
+
+```powershell
+# Create a ready private preflight record, then select an actionable goal.
+python scripts/prepare_project_context.py --project-id <project-id> --reason "start checklist goal"
+python scripts/checklist_loop.py --startup-context reports/local/startup-context/latest.json goal --reason "start the next scoped task" --execution-scope project_root_execution --permission-mode full_access
+
+# After the goal produces its evidence, persist its outcome and get the next goal.
+python scripts/checklist_loop.py --startup-context reports/local/startup-context/latest.json loop --item-id <checklist-id> --outcome completed --write --execution-scope project_root_execution --permission-mode full_access
+```
+
+`full_access` is an explicitly authorized write envelope for the resolved `project_root_execution` scope. It makes normal quality/evidence thresholds advisory, but still requires scope identity, traceability, warnings/risks reporting, and human follow-up. It does not authorize scope expansion or unrecorded writes. `goal` is the default bounded write mode for the checklist loop; it follows the same advisory-gate/reporting model.
+
+Read-only monitoring and review may use `governance_observation`. It does not require approval. A governance-source update is never automatic: submit the requested change, obtain approval, then run the write with an approval reference.
+
+The repo-local Codex plugin provides the same workflow as `/governance:claim-goal` and `/governance:advance-goal`; see [`plugins/governance/README.md`](plugins/governance/README.md). The CLI remains the portable fallback.
 
 ## Operating flow
 
@@ -82,9 +102,17 @@ In a private workspace, populate `config/project-roots.local.json`, then run:
 python scripts/build_governance_inventory.py
 python scripts/validate_governance.py
 python scripts/create_rollback_manifest.py
+python scripts/checklist_loop.py goal --reason "start the next scoped task" --execution-scope governance_root_only
+python scripts/refresh_governance_status.py --fail-if-stale
 ```
 
 With the local registry present, outputs are written under ignored `reports/local/` and the rendered Dashboard remains local. Without it, the public template produces an empty, non-personal inventory.
+
+`scripts/refresh_governance_status.py` is the periodic status mechanism. It refreshes the inventory, writes a private proposal under `reports/local/status-refresh/`, and returns a stale signal without modifying the source ledger. Apply only an approved proposal with `--apply --approval-ref <ref>`; it updates `STATUS.local.json` facts while preserving human judgment fields. A scheduler may invoke the scan command every 24 hours.
+
+All registered project ledgers are centrally registered with `python scripts/register_ledger_refresh.py`. Each record receives a scan trigger and an approval-gated apply trigger. Use `python scripts/refresh_registered_ledger.py --project-id <id>` for one project; use the generated private registry to drive an approved batch refresh.
+
+The built-in cross-platform scheduler is `python scripts/ledger_refresh_scheduler.py --interval-hours 24`; use `--once` for a single cycle. It records heartbeat and run reports under ignored `reports/local/ledger-refresh/scheduler/` and is scan-only by default.
 
 ## Development stages
 

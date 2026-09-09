@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### 2026-08-29 Checklist-to-goal loop
+
+- Added a machine-readable checklist-loop contract plus `goal` and `loop` commands that create private run records and select one bounded actionable item at a time.
+- Completion writes to the checklist only on an explicit `--write` action after dependency and exit-evidence checks pass; the command then emits the next eligible goal.
+- Documented `full_access` as a pre-authorized runtime envelope for `project_root_execution`, not a way to bypass preflight, local contracts, or external-write controls.
+- Extended the validator to require the checklist-loop contract and its command implementation.
+
+### 2026-08-29 Governance slash commands
+
+- Added the repo-local `governance` Codex plugin and marketplace entry.
+- Added `/governance:claim-goal` and `/governance:advance-goal` command contracts for the bounded checklist loop.
+- Kept `scripts/checklist_loop.py` as the plugin-independent CLI fallback.
+
 ### 2026-08-26 Project start and switch gate
 
 - Added explicit `governance_root_only` and `project_root_execution` scopes for registered projects.

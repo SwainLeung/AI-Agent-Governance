@@ -22,7 +22,7 @@
     "control_or_rules"
   ],
   "allowed_risk_tiers": ["L0", "L1", "L2", "L3"],
-  "allowed_execution_scopes": ["governance_root_only", "project_root_execution"],
+  "allowed_execution_scopes": ["governance_root_only", "governance_observation", "project_root_execution"],
   "required_project_fields": ["id", "path", "role", "risk_tier", "execution_scope"],
   "privacy_note": "Populate project-roots.local.json in a private workspace. Do not commit local project names or paths."
 }
